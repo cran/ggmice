@@ -7,7 +7,7 @@
 ggmice(data = NULL, mapping = ggplot2::aes())
 }
 \arguments{
-\item{data}{An incomplete dataset (of class \code{data.frame} or \code{matrix}), or an object of class \code{\link[mice:mids-class]{mice::mids}}.}
+\item{data}{An incomplete dataset (of class \code{data.frame}), or an object of class \code{\link[mice:mids-class]{mice::mids}}.}
 
 \item{mapping}{A list of aesthetic mappings created with \code{\link[ggplot2:aes]{ggplot2::aes()}}.}
 }
@@ -22,5 +22,7 @@ dat <- mice::nhanes
 ggmice(dat, ggplot2::aes(x = age, y = bmi)) + ggplot2::geom_point()
 }
 \seealso{
-See the \code{ggmice} vignette to use the \code{ggmice()} function on \href{https://amices.org/ggmice/articles/ggmice.html#the-ggmice-function}{incomplete data} or \href{https://amices.org/ggmice/articles/ggmice.html#the-ggmice-function-1}{imputed data}.
+See the \code{ggmice} vignette to use the \code{ggmice()} function on
+\href{https://amices.org/ggmice/articles/ggmice.html#the-ggmice-function}{incomplete data}
+or \href{https://amices.org/ggmice/articles/ggmice.html#the-ggmice-function-1}{imputed data}.
 }

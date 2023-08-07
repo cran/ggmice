@@ -3,103 +3,161 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
   fig.width = 7.2,
-  fig.height = 4
+  fig.height = 4,
+  warning = FALSE,
+  message = FALSE
 )
+options(rmarkdown.html_vignette.check_title = FALSE)
 
-## ----setup--------------------------------------------------------------------
+## ----setup, warning = FALSE, message = FALSE----------------------------------
 # load packages
 library(ggmice)
-# load incomplete dataset 
-dat <- mice::boys
+library(mice)
+library(ggplot2)
+# load incomplete dataset from mice
+dat <- boys
 # generate imputations
-imp <- mice::mice(dat, method = "pmm", printFlag = FALSE)
+imp <- mice(dat, method = "pmm", printFlag = FALSE)
 
 ## ----bwplot-------------------------------------------------------------------
 # original plot
-mice::bwplot(imp, bmi ~ .imp)
+mice::bwplot(imp, hgt ~ .imp)
 # ggmice equivalent
-ggmice(imp, ggplot2::aes(x = .imp, y = bmi)) +
-      ggplot2::geom_boxplot() +
-      ggplot2::labs(x = "Imputation number")
+ggmice(imp, aes(x = .imp, y = hgt)) +
+  geom_boxplot() +
+  labs(x = "Imputation number")
 # extended reproduction with ggmice
-ggmice(imp, ggplot2::aes(x = .imp, y = bmi)) +
-  ggplot2::stat_boxplot(geom = 'errorbar', linetype = "dashed") +
-  ggplot2::geom_boxplot(outlier.colour = "grey", outlier.shape = 1) +
-  ggplot2::labs(x = "Imputation number") +
-  ggplot2::theme(legend.position = "none")
+ggmice(imp, aes(x = .imp, y = hgt)) +
+  stat_boxplot(geom = "errorbar", linetype = "dashed") +
+  geom_boxplot(outlier.colour = "grey", outlier.shape = 1) +
+  labs(x = "Imputation number") +
+  theme(legend.position = "none")
 
 ## ----densityplot--------------------------------------------------------------
 # original plot
-mice::densityplot(imp, ~bmi)
+mice::densityplot(imp, ~hgt)
 # ggmice equivalent
-ggmice(imp, ggplot2::aes(x = bmi, group = .imp)) +
-      ggplot2::geom_density() 
+ggmice(imp, aes(x = hgt, group = .imp)) +
+  geom_density()
 # extended reproduction with ggmice
-ggmice(imp, ggplot2::aes(x = bmi, group = .imp, size = .where)) +
-  ggplot2::geom_density() +
-  ggplot2::scale_size_manual(values = c("observed" = 1, "imputed" = 0.5),
-                             guide = "none") +
-  ggplot2::theme(legend.position = "none")
+ggmice(imp, aes(x = hgt, group = .imp, size = .where)) +
+  geom_density() +
+  scale_size_manual(
+    values = c("observed" = 1, "imputed" = 0.5),
+    guide = "none"
+  ) +
+  theme(legend.position = "none")
 
 ## ----flux---------------------------------------------------------------------
 # original plot
-mice::fluxplot(dat)
+fluxplot(dat)
 # ggmice equivalent
 plot_flux(dat)
 
 ## ----md.pattern---------------------------------------------------------------
 # original plot
-md <- mice::md.pattern(dat)
+md <- md.pattern(dat)
 # ggmice equivalent
 plot_pattern(dat)
 # extended reproduction with ggmice
 plot_pattern(dat, square = TRUE) +
-  ggplot2::theme(legend.position = "none",
-                 axis.title = ggplot2::element_blank(),
-                 axis.title.x.top = ggplot2::element_blank(),
-                 axis.title.y.right = ggplot2::element_blank())
+  theme(
+    legend.position = "none",
+    axis.title = element_blank(),
+    axis.title.x.top = element_blank(),
+    axis.title.y.right = element_blank()
+  )
 
 ## ----plot.mids----------------------------------------------------------------
 # original plot
-plot(imp, bmi ~ .it | .ms)
+plot(imp, hgt ~ .it | .ms)
 # ggmice equivalent
-plot_trace(imp, "bmi")
+plot_trace(imp, "hgt")
 
 ## ----stripplot----------------------------------------------------------------
 # original plot
-mice::stripplot(imp, bmi ~ .imp)
+mice::stripplot(imp, hgt ~ .imp)
 # ggmice equivalent
-ggmice(imp, ggplot2::aes(x = .imp, y = bmi)) +
-  ggplot2::geom_jitter(width = 0.25) +
-  ggplot2::labs(x = "Imputation number")
+ggmice(imp, aes(x = .imp, y = hgt)) +
+  geom_jitter(width = 0.25) +
+  labs(x = "Imputation number")
 # extended reproduction with ggmice (not recommended)
-ggmice(imp, ggplot2::aes(x = .imp, y = bmi)) +
-  ggplot2::geom_jitter(
+ggmice(imp, aes(x = .imp, y = hgt)) +
+  geom_jitter(
     shape = 1,
     width = 0.1,
     na.rm = TRUE,
     data = data.frame(
-      bmi = dat$bmi,
+      hgt = dat$hgt,
       .imp = factor(rep(1:imp$m, each = nrow(dat))),
       .where = "observed"
     )
   ) +
-  ggplot2::geom_jitter(shape = 1, width = 0.1) +
-  ggplot2::labs(x = "Imputation number") +
-  ggplot2::theme(legend.position = "none")
+  geom_jitter(shape = 1, width = 0.1) +
+  labs(x = "Imputation number") +
+  theme(legend.position = "none")
 
 ## -----------------------------------------------------------------------------
 # original plot
-mice::xyplot(imp, bmi ~ age)
+mice::xyplot(imp, hgt ~ age)
 # ggmice equivalent
-ggmice(imp, ggplot2::aes(age, bmi)) +
-  ggplot2::geom_point()
+ggmice(imp, aes(age, hgt)) +
+  geom_point()
 # extended reproduction with ggmice
-ggmice(imp, ggplot2::aes(age, bmi)) +
-  ggplot2::geom_point(size = 2, shape = 1) +
-  ggplot2::theme(legend.position = "none")
+ggmice(imp, aes(age, hgt)) +
+  geom_point(size = 2, shape = 1) +
+  theme(legend.position = "none")
+
+## ----plotly-------------------------------------------------------------------
+# load packages
+library(plotly)
+# influx and outflux plot
+p <- plot_flux(dat)
+ggplotly(p)
+
+## ----mapping------------------------------------------------------------------
+# load packages
+library(purrr)
+library(patchwork)
+# create vector with variable names
+vrb <- names(dat)
+
+## ----bwplots------------------------------------------------------------------
+# original plot
+mice::bwplot(imp)
+# ggmice equivalent
+p <- map(vrb, ~ {
+  ggmice(imp, aes(x = .imp, y = .data[[.x]])) +
+    geom_boxplot() +
+    scale_x_discrete(drop = FALSE) +
+    labs(x = "Imputation number")
+})
+wrap_plots(p, guides = "collect") &
+  theme(legend.position = "bottom")
+
+## ----densityplots, message=FALSE, warning=FALSE-------------------------------
+# original plot
+mice::densityplot(imp)
+# ggmice equivalent
+p <- map(vrb, ~ {
+  ggmice(imp, aes(x = .data[[.x]], group = .imp)) +
+    geom_density()
+})
+wrap_plots(p, guides = "collect") &
+  theme(legend.position = "bottom")
+
+## ----stripplots---------------------------------------------------------------
+# original plot
+mice::stripplot(imp)
+# ggmice equivalent
+p <- map(vrb, ~ {
+  ggmice(imp, aes(x = .imp, y = .data[[.x]])) +
+    geom_jitter() +
+    labs(x = "Imputation number")
+})
+wrap_plots(p, guides = "collect") &
+  theme(legend.position = "bottom")
 
 ## ----session, class.source = 'fold-hide'--------------------------------------
-# this vignette was generated with R session
 sessionInfo()
 
